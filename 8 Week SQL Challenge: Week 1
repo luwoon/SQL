@@ -92,6 +92,15 @@ limit 1;
 
 -- 5. Which item was the most popular for each customer?
 
+select customer_id
+,count(product_id) as total_items
+,sum(price) as amount_spent
+from dannys_diner.sales
+join dannys_diner.menu using(product_id)
+join dannys_diner.members using(customer_id)
+where order_date < join_date
+group by customer_id;
+
 -- 6. Which item was purchased first by the customer after they became a member?
 
 with after_member_cte as (

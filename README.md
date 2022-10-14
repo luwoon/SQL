@@ -9,3 +9,6 @@ From sql-practice.com:
 
 From datacamp.com:
 1.  Project: Analyze International Debt Statistics
+
+From 8 Week SQL Challenge:
+1.  Week 1 - Danny's Diner

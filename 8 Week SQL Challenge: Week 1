@@ -92,6 +92,21 @@ limit 1;
 
 -- 5. Which item was the most popular for each customer?
 
+with popular_cte as (
+select customer_id
+,product_id
+,count(product_id) as times_purchased
+,rank() over(partition by customer_id order by count(product_id) desc)
+from dannys_diner.sales
+group by customer_id
+,product_id
+)
+select customer_id
+,product_id
+,times_purchased
+from popular_cte
+where rank=1;
+
 -- 6. Which item was purchased first by the customer after they became a member?
 
 with after_member_cte as (
@@ -133,4 +148,23 @@ group by customer_id;
 
 -- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
+with points_cte as (
+select customer_id
+,product_id
+,price
+,case 
+when product_id=1 then 200
+when product_id=2 then 150
+when product_id=3 then 120
+end as points
+from dannys_diner.sales s
+left join dannys_diner.menu m using(product_id)
+)
+select customer_id
+,sum(points)
+from points_cte
+group by customer_id;
+
 -- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+

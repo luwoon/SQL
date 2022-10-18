@@ -153,9 +153,9 @@ select customer_id
 ,product_id
 ,price
 ,case 
-when product_id=1 then 200
-when product_id=2 then 150
-when product_id=3 then 120
+when product_id=1 then 20*price
+when product_id=2 then 10*price
+when product_id=3 then 10*price
 end as points
 from dannys_diner.sales s
 left join dannys_diner.menu m using(product_id)
@@ -173,22 +173,18 @@ select customer_id
 ,product_id
 ,price
 ,case
-when product_id=1 then 200
-when product_id=2 and order_date not between '2021-01-07' and '2021-01-13' and customer_id='A' then 150
-when product_id=3 and order_date not between '2021-01-07' and '2021-01-13' and customer_id='A' then 120
-when product_id=2 and order_date not between '2021-01-09' and '2021-01-15' and customer_id='B' then 150
-when product_id=3 and order_date not between '2021-01-09' and '2021-01-15' and customer_id='B' then 120
-when product_id=2 and order_date between '2021-01-07' and '2021-01-13' and customer_id='A' then 300
-when product_id=3 and order_date between '2021-01-07' and '2021-01-13' and customer_id='A' then 240
-when product_id=2 and order_date between '2021-01-09' and '2021-01-15' and customer_id='B' then 300
-when product_id=3 and order_date between '2021-01-09' and '2021-01-15' and customer_id='B' then 240
+when product_id=1 then 20*price
+when product_id=2 and order_date between join_date and join_date + 7 then 20*price
+when product_id=3 and order_date between join_date and join_date + 7 then 20*price
+else 10*price
 end as points
 from dannys_diner.sales s
 left join dannys_diner.menu m using(product_id)
-where customer_id in (select customer_id from dannys_diner.members)
+left join dannys_diner.members using(customer_id)
 order by order_date
 )
 select customer_id
 ,sum(points)
 from first_week_cte
+where customer_id in (select customer_id from dannys_diner.members)
 group by customer_id;

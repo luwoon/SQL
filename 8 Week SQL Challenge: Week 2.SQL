@@ -122,33 +122,35 @@ VALUES
 --A. Pizza Metrics
 --1. How many pizzas were ordered?
 
-select count(*)
+select count(*) as n_pizzas_ordered
 from pizza_runner.customer_orders;
 
 --2. How many unique customer orders were made?
 
-select count(distinct order_id)
+select count(distinct order_id) as unique_customer_orders
 from pizza_runner.customer_orders;
 
 --3. How many successful orders were delivered by each runner?
 
 select runner_id
-,count(order_id)
+,count(order_id) as n_successful_orders
 from pizza_runner.runner_orders
 where cancellation is null or cancellation not in ('Restaurant Cancellation', 'Customer Cancellation')
-group by runner_id;
+group by runner_id
+order by runner_id;
 
 --4. How many of each type of pizza was delivered?
 
-select pizza_id
-,count(pizza_id)
+select pizza_name
+,count(pizza_id) as n_delivered
 from pizza_runner.customer_orders
+left join pizza_runner.pizza_names using(pizza_id)
 where order_id in (
 select order_id
 from pizza_runner.runner_orders
 where cancellation is null or cancellation not in ('Restaurant Cancellation', 'Customer Cancellation')
 )
-group by pizza_id;
+group by pizza_name;
 
 --5. How many Vegetarian and Meatlovers were ordered by each customer?
 
@@ -175,7 +177,7 @@ select order_id
 from pizza_runner.customer_orders
 group by order_id
 )
-select max(pizza_count)
+select max(pizza_count) as max_n
 from max_number_cte
 where order_id in (
 select order_id
@@ -204,6 +206,8 @@ when extras='' then 0
 else 1
 end as extras_count
 from pizza_runner.customer_orders
+left join pizza_runner.runner_orders using(order_id)
+where cancellation is null or cancellation not in ('Restaurant Cancellation', 'Customer Cancellation')
 )
 select count(pizza_id)
 from exclusions_extras_count

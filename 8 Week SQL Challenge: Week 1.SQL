@@ -193,7 +193,6 @@ end as points
 from dannys_diner.sales 
 left join dannys_diner.menu using(product_id)
 left join dannys_diner.members using(customer_id)
-order by order_date
 )
 select customer_id
 ,sum(points) as points

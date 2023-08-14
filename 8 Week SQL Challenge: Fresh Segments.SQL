@@ -1,5 +1,7 @@
 -- Schema SQL at https://8weeksqlchallenge.com/case-study-8/
 
+-- DATA EXPLORATION AND CLEANING
+
 -- Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month.
 
 alter table fresh_segments.interest_metrics

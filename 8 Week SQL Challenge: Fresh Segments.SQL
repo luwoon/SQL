@@ -108,6 +108,39 @@ from count_cte;
 -- SEGMENT ANALYSIS
 
 -- Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
+
+with filtered_cte as (
+select interest_id
+,count(distinct month_year) as total_months
+from fresh_segments.interest_metrics
+group by interest_id
+having count(distinct month_year) > 5
+)
+select f.interest_id
+,i.month_year
+,i.composition
+from filtered_cte f
+join fresh_segments.interest_metrics i 
+on f.interest_id = i.interest_id
+order by i.composition desc
+limit 10;
+
+with filtered_cte as (
+select interest_id
+,count(distinct month_year) as total_months
+from fresh_segments.interest_metrics
+group by interest_id
+having count(distinct month_year) > 5
+)
+select f.interest_id
+,i.month_year
+,i.composition
+from filtered_cte f
+join fresh_segments.interest_metrics i 
+on f.interest_id = i.interest_id
+order by i.composition
+limit 10;
+
 -- Which 5 interests had the lowest average ranking value?
 -- Which 5 interests had the largest standard deviation in their percentile_ranking value?
 -- For the 5 interests found in the previous question - what was minimum and maximum percentile_ranking values for each interest and its corresponding year_month value? Can you describe what is happening for these 5 interests?

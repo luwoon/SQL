@@ -142,7 +142,24 @@ order by i.composition
 limit 10;
 
 -- Which 5 interests had the lowest average ranking value?
+
+select interest_id
+,round(avg(ranking),2)
+from fresh_segments.interest_metrics
+group by interest_id
+order by avg(ranking)
+limit 5;
+
 -- Which 5 interests had the largest standard deviation in their percentile_ranking value?
+
+select interest_id
+,round(cast(stddev(percentile_ranking) as numeric),2) as std_percentile
+from fresh_segments.interest_metrics
+group by interest_id
+having round(cast(stddev(percentile_ranking) as numeric),2) is not null
+order by round(cast(stddev(percentile_ranking) as numeric),2) desc
+limit 5;
+
 -- For the 5 interests found in the previous question - what was minimum and maximum percentile_ranking values for each interest and its corresponding year_month value? Can you describe what is happening for these 5 interests?
 -- How would you describe our customers in this segment based off their composition and ranking values? What sort of products or services should we show to these customers and what should we avoid?
 

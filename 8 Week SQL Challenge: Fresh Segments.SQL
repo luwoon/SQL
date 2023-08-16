@@ -28,6 +28,9 @@ order by month_year asc nulls first;
 -- What do you think we should do with these null values in the fresh_segments.interest_metrics?
 -- Remove these records.
 
+delete from fresh_segments.interest_metrics
+where month_year is null;
+
 -- How many interest_id values exist in the fresh_segments.interest_metrics table but not in the fresh_segments.interest_map table? What about the other way around?
 
 with cte1 as (
@@ -66,3 +69,34 @@ select *
 from fresh_segments.interest_metrics e
 left join fresh_segments.interest_map a
 on e.interest_id::integer = a.id;
+
+-- INTEREST ANALYSIS
+
+-- Which interests have been present in all month_year dates in our dataset?
+
+select count(distinct month_year)
+from fresh_segments.interest_metrics;
+select interest_id
+from fresh_segments.interest_metrics
+group by interest_id
+having count(distinct month_year) = 14;
+
+-- Using this same total_months measure - calculate the cumulative percentage of all records starting at 14 months - which total_months value passes the 90% cumulative percentage value?
+
+with total_months_cte as (
+select interest_id
+,count(distinct month_year) as total_months
+from fresh_segments.interest_metrics
+group by interest_id
+)
+,count_cte as (
+select total_months
+,count(distinct interest_id) as interest_count
+from total_months_cte
+group by total_months
+)
+select total_months
+,interest_count
+,sum(interest_count) over (order by total_months desc) as cumulative_sum
+,100 * sum(interest_count) over (order by total_months desc)/sum(interest_count) over () as cumulative_percentage
+from count_cte;

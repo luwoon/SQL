@@ -1,6 +1,6 @@
 # SQL Portfolio
 
-Hello! This repository contains samples of SQL that I have written for projects, practice questions, and data analytics courses. I began my self-learning journey of the language to maximise the capabilities of IBM Cognos and SQL in my current job. Feel free to look around here and reach out if you have any questions or feedback. :relaxed:
+Hello! This repository contains samples of SQL that I have written for projects, practice questions, and data analytics courses. Feel free to look around here and reach out if you have any questions or feedback. :relaxed:
 
 | Project Name    | Description |
 | -------- | ------- |

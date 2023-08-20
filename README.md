@@ -1,4 +1,4 @@
-# SQL
+# SQL Portfolio
 
 Hello! This repository contains samples of SQL that I have written for projects, practice questions, and data analytics courses. I began my self-learning journey of the language when my job required me to work extensively with IBM Cognos and SQL. Feel free to look around here and reach out if you have any questions or feedback!
 

@@ -4,7 +4,7 @@ Hello! This repository contains samples of SQL that I have written for projects,
 
 | Project Name    | Description |
 | -------- | ------- |
-| [8 Week SQL Challenge: Danny's Diner]https://github.com/luwoon/SQL-Portfolio/blob/main/8%20Week%20SQL%20Challenge:%20Danny's%20Diner.SQL | From the 8 Week SQL Challenge |
-| 8 Week SQL Challenge: Fresh Segments | From the 8 Week SQL Challenge |
-| DataCamp Project: Analyze International Debt Statistics | Project from DataCamp course, using the Jupyter Notebook |
-| sql-practice.com Answers (Easy/Hard/Medium)  | Practice questions from sql-practice.com |
+| [8 Week SQL Challenge: Danny's Diner](https://github.com/luwoon/SQL-Portfolio/blob/main/8%20Week%20SQL%20Challenge:%20Danny's%20Diner.SQL | From the 8 Week SQL Challenge) |
+| [8 Week SQL Challenge: Fresh Segments](https://github.com/luwoon/SQL-Portfolio/blob/main/8%20Week%20SQL%20Challenge%3A%20Fresh%20Segments.SQL) | From the 8 Week SQL Challenge |
+| [DataCamp Project: Analyze International Debt Statistics](https://github.com/luwoon/SQL-Portfolio/blob/main/DataCamp%20Project%3A%20Analyze%20International%20Debt%20Statistics.ipynb) | Project from DataCamp course, using the Jupyter Notebook |
+| [sql-practice.com Answers ([Easy](https://github.com/luwoon/SQL-Portfolio/blob/main/sql-practice.com%20Answers%20(Easy).SQL)/[Medium](https://github.com/luwoon/SQL-Portfolio/blob/main/sql-practice.com%20Answers%20(Medium).SQL)/[Hard](https://github.com/luwoon/SQL-Portfolio/blob/main/sql-practice.com%20Answers%20(Hard).SQL))  | Practice questions from sql-practice.com |

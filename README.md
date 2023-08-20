@@ -2,6 +2,13 @@
 
 Hello! This repository contains samples of SQL that I have written for projects, practice questions, and data analytics courses. I began my self-learning journey of the language when my job required me to work extensively with IBM Cognos and SQL. Feel free to look around here and reach out if you have any questions or feedback!
 
+| Project Name    | Description |
+| -------- | ------- |
+| 8 Week SQL Challenge: Danny's Diner |  |
+| sql-practice.com Answers (Easy/Hard/Medium)  | Practice questions |
+| February | $80     |
+| March    | $420    |
+
 From sql-practice.com:
 1.  sql-practice.com Answers (Easy)
 2.  sql-practice.com Answers (Medium)

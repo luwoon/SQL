@@ -27,6 +27,10 @@ from clique_bait.events
 group by event_type;
 
 -- What is the percentage of visits which have a purchase event?
+
+select round((cast(count(case when event_type = 3 then visit_id end) as decimal)/count(event_type)*100),2)
+from clique_bait.events;
+
 -- What is the percentage of visits which view the checkout page but do not have a purchase event?
 -- What are the top 3 pages by number of views?
 -- What is the number of views and cart adds for each product category?

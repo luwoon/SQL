@@ -32,6 +32,10 @@ select round((cast(count(case when event_type = 3 then visit_id end) as decimal)
 from clique_bait.events;
 
 -- What is the percentage of visits which view the checkout page but do not have a purchase event?
+
+select 100-(round((cast(count(case when event_type = 3 then visit_id end) as decimal)/count(case when event_type = 2 then visit_id end)*100),2))
+from clique_bait.events;
+
 -- What are the top 3 pages by number of views?
 -- What is the number of views and cart adds for each product category?
 -- What are the top 3 products by purchases?

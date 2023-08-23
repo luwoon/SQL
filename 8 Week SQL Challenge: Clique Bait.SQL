@@ -37,5 +37,27 @@ select 100-(round((cast(count(case when event_type = 3 then visit_id end) as dec
 from clique_bait.events;
 
 -- What are the top 3 pages by number of views?
+
+select e.page_id
+,p.page_name
+,count(case when e.event_type = 1 then e.event_type end)
+from clique_bait.events e
+join clique_bait.page_hierarchy p using(page_id) 
+group by e.page_id
+,p.page_name
+order by 3 desc
+limit 3;
+
 -- What is the number of views and cart adds for each product category?
+
+select p.product_category
+,p.product_id
+,count(case when e.event_type = 1 then e.event_type end) as n_views
+,count(case when e.event_type = 2 then e.event_type end) as n_cart_adds
+from clique_bait.events e
+join clique_bait.page_hierarchy p using(page_id)
+where p.product_id is not null
+group by p.product_category
+,p.product_id;
+
 -- What are the top 3 products by purchases?

@@ -143,5 +143,21 @@ select customer_id
 ,sum(points) as points
 from first_week_cte
 where customer_id in (select customer_id from dannys_diner.members)
+
+-- Bonus question: Join All The Things
+
+select s.customer_id
+,s.order_date
+,m.product_name
+,m.price
+,case
+when e.join_date is not null and e.join_date<=s.order_date then 'Y'
+else 'N'
+end as members
+from dannys_diner.sales s
+left join dannys_diner.menu m using(product_id)
+left join dannys_diner.members e using(customer_id)
+order by s.customer_id
+,s.order_date;
 group by customer_id
 order by customer_id;

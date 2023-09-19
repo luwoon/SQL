@@ -161,3 +161,26 @@ order by s.customer_id
 ,s.order_date;
 group by customer_id
 order by customer_id;
+
+-- Bonus question: Rank All The Things
+
+with ranking_cte as (
+select s.customer_id
+,s.order_date
+,m.product_name
+,m.price
+,case
+when e.join_date is not null and e.join_date<=s.order_date then 'Y'
+else 'N'
+end as members
+from dannys_diner.sales s
+left join dannys_diner.menu m using(product_id)
+left join dannys_diner.members e using(customer_id)
+order by s.customer_id
+,s.order_date)
+select *
+,case
+when members='Y' then dense_rank() over (partition by customer_id, members order by order_date asc)
+else null
+end as ranking
+from ranking_cte;

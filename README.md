@@ -1,6 +1,6 @@
 # SQL Portfolio
 
-Hello! This repository contains samples of SQL that I have written for projects, practice questions, and data analytics courses. Feel free to look around here and reach out if you have any questions or feedback. :relaxed:
+This repository contains samples of SQL that I have written for projects, practice questions, and data analytics courses.
 
 | Project Name    | Description |
 | -------- | ------- |

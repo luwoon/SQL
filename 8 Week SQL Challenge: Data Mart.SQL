@@ -141,3 +141,127 @@ else 0
 end) as avg_shopify_transactions
 from clean_weekly_sales
 group by calendar_year;
+
+-- BEFORE AND AFTER ANALYSIS
+
+-- What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?
+
+select distinct week_number
+from clean_weekly_sales
+where week_date='2020-06-15' and calendar_year=2020;
+
+with cte as (
+select 
+week_date
+,week_number     
+,sum(sales::numeric) as total_sales
+from clean_weekly_sales
+where week_number between 21 and 28 and calendar_year=2020
+group by week_date
+,week_number
+)
+,before_after as (
+select
+sum(case
+when week_number between 21 and 24
+then total_sales
+end) as sales_before
+,sum(case
+when week_number between 25 and 28 then total_sales
+end) as sales_after
+from cte
+)
+select 
+sales_after-sales_before as growth
+,round(((sales_after-sales_before)/sales_before*100),2) as percentage
+from before_after;
+-- The sales decreased by $26884188, or 1.15%.
+
+-- What about the entire 12 weeks before and after?
+
+with cte as (
+select 
+week_date
+,week_number     
+,sum(sales::numeric) as total_sales
+from clean_weekly_sales
+where week_number between 13 and 37 and calendar_year=2020
+group by week_date
+,week_number
+)
+,before_after as (
+select
+sum(case
+when week_number between 13 and 24
+then total_sales
+end) as sales_before
+,sum(case
+when week_number between 25 and 37 then total_sales
+end) as sales_after
+from cte
+)
+select 
+sales_after-sales_before as growth
+,round(((sales_after-sales_before)/sales_before*100),2) as percentage
+from before_after;
+-- The sales decreased by $152325394, or 2.14%.
+
+-- How do the sale metrics for these 2 periods before and after compare with the previous years in 2018 and 2019?
+
+with cte as (
+select 
+calendar_year
+,week_number     
+,sum(sales::numeric) as total_sales
+from clean_weekly_sales
+where week_number between 21 and 28
+group by calendar_year
+,week_number
+)
+,before_after as (
+select
+calendar_year
+,sum(case
+when week_number between 21 and 24
+then total_sales
+end) as sales_before
+,sum(case
+when week_number between 25 and 28 then total_sales
+end) as sales_after
+from cte
+group by calendar_year
+)
+select 
+calendar_year
+,sales_after-sales_before as growth
+,round(((sales_after-sales_before)/sales_before*100),2) as percentage
+from before_after;
+
+with cte as (
+select 
+calendar_year
+,week_number     
+,sum(sales::numeric) as total_sales
+from clean_weekly_sales
+where week_number between 13 and 37
+group by calendar_year
+,week_number
+)
+,before_after as (
+select
+calendar_year
+,sum(case
+when week_number between 13 and 24
+then total_sales
+end) as sales_before
+,sum(case
+when week_number between 25 and 37 then total_sales
+end) as sales_after
+from cte
+group by calendar_year
+)
+select 
+calendar_year
+,sales_after-sales_before as growth
+,round(((sales_after-sales_before)/sales_before*100),2) as percentage
+from before_after;

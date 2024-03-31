@@ -103,7 +103,7 @@ from count_cte;
 
 -- If we were to remove all interest_id values which are lower than the total_months value we found in the previous question - how many total data points would we be removing?
 -- Does this decision make sense to remove these data points from a business perspective? Use an example where there are all 14 months present to a removed interest example for your arguments - think about what it means to have less months present from a segment perspective.
---After removing these interests - how many unique interests are there for each month?
+-- After removing these interests, how many unique interests are there for each month?
 
 -- SEGMENT ANALYSIS
 

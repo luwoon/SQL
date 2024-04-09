@@ -1,267 +1,216 @@
 -- Schema SQL at https://8weeksqlchallenge.com/case-study-5/
 
 -- DATA CLEANING
--- Convert the week_date to a DATE format
--- Add a week_number as the second column for each week_date value, for example any value from the 1st of January to 7th of January will be 1, 8th to 14th will be 2 etc
--- Add a month_number with the calendar month for each week_date value as the 3rd column
--- Add a calendar_year column as the 4th column containing either 2018, 2019 or 2020 values
--- Add a new column called age_band after the original segment column using the following mapping on the number inside the segment value
+-- Convert the week_date to a DATE format.
+-- Add a week_number as the second column for each week_date value, for example any value from the 1st of January to 7th of January will be 1, 8th to 14th will be 2 etc.
+-- Add a month_number with the calendar month for each week_date value as the 3rd column.
+-- Add a calendar_year column as the 4th column containing either 2018, 2019 or 2020 values.
+-- Add a new column called age_band after the original segment column using the following mapping on the number inside the segment value.
 
-create table clean_weekly_sales as (
-select to_date(week_date,'DD-MM-YY') as week_date
-,extract(week from to_date(week_date,'DD-MM-YY')) as week_number     
-,extract(month from to_date(week_date,'DD-MM-YY')) as month_number
-,extract(year from to_date(week_date,'DD-MM-YY')) as calendar_year
-,region
-,platform
-,case
-when segment='null' then 'unknown'
-else segment
-end as segment
-,case
-when segment like '_1' then 'Young Adults'
-when segment like '_2' then 'Middle Aged'
-when segment like '_3' or segment like '_4' then 'Retirees'
-else 'unknown'
-end as age_band
-,case
-when segment like 'C_' then 'Couples'
-when segment like 'F_' then 'Families'
-else 'unknown'
-end as demographic
-,customer_type
-,transactions
-,sales
-,round(sales::numeric/transactions::numeric,2) as avg_transaction
-from data_mart.weekly_sales);
+CREATE TABLE clean_weekly_sales AS (
+SELECT TO_DATE(week_date,'DD-MM-YY') AS week_date,
+EXTRACT(WEEK FROM TO_DATE(week_date,'DD-MM-YY')) AS week_numbeR,
+EXTRACT(MONTH FROM TO_DATE(week_date,'DD-MM-YY')) AS month_number,
+EXTRACT(YEAR FROM TO_DATE(week_date,'DD-MM-YY')) AS calendar_year,
+region,
+platform,
+CASE
+WHEN segment = 'null' THEN 'unknown'
+ELSE segment
+END AS segment,
+CASE
+WHEN segment LIKE '_1' THEN 'Young Adults'
+WHEN segment LIKE '_2' THEN 'Middle Aged'
+WHEN segment LIKE '_3' OR segment LIKE '_4' THEN 'Retirees'
+ELSE 'unknown'
+END AS age_band,
+CASE
+WHEN segment LIKE 'C_' THEN 'Couples'
+WHEN segment LIKE 'F_' THEN 'Families'
+ELSE 'unknown'
+END AS demographic,
+customer_type,
+transactions,
+sales,
+ROUND(sales::NUMERIC/transactions::NUMERIC, 2) AS avg_transaction
+FROM data_mart.weekly_sales);
 
 -- DATA EXPLORATION
 
 -- What day of the week is used for each week_date value?
-
-select to_char(week_date, 'Day') from clean_weekly_sales;
+SELECT TO_CHAR(week_date, 'DAY') FROM clean_weekly_sales;
 -- Monday
 
 -- What range of week numbers are missing from the dataset?
-
-select week_number from clean_weekly_sales;
+SELECT week_number FROM clean_weekly_sales;
 -- Before 13 and after 36
 
 -- How many total transactions were there for each year in the dataset?
-
-select calendar_year
-,sum(transactions) as total_transactions
-from clean_weekly_sales
-group by calendar_year;
+SELECT calendar_year, SUM(transactions) AS total_transactions
+FROM clean_weekly_sales
+GROUP BY calendar_year;
 
 -- What is the total sales for each region for each month?
-
-select region
-,month_number
-,sum(sales) as total_sales
-from clean_weekly_sales
-group by region
-,month_number
-order by region
-,month_number;
+SELECT region, month_number, SUM(sales) AS total_sales
+FROM clean_weekly_sales
+GROUP BY region, month_number
+ORDER BY region, month_number;
 
 -- What is the total count of transactions for each platform?
-
-select platform
-,count(transactions) as transaction_count
-from clean_weekly_sales
-group by platform;
+SELECT platform, COUNT(transactions) AS transaction_count
+FROM clean_weekly_sales
+GROUP BY platform;
 
 -- What is the percentage of sales for Retail vs Shopify for each month?
-
-select month_number
-,sum(case
-when platform='Retail' then sales::numeric
-else 0
-end) as retail_sales
-,sum(case
-when platform='Shopify' then sales::numeric
-else 0
-end) as shopify_sales
-,round((sum(case
-when platform='Retail' then sales::numeric
-else 0
-end)/sum(sales::numeric)*100),2) as retail_sales_percentage
-,round((sum(case
-when platform='Shopify' then sales::numeric
-else 0
-end)/sum(sales::numeric)),2) as shopify_sales_percentage
-from clean_weekly_sales
-group by month_number;
+SELECT month_number,
+SUM(CASE
+WHEN platform = 'Retail' THEN sales::NUMERIC
+ELSE 0
+END) as retail_sales,
+SUM(CASE
+WHEN platform = 'Shopify' THEN sales::NUMERIC
+ELSE 0
+END) AS shopify_sales,
+ROUND((SUM(CASE
+WHEN platform = 'Retail' THEN sales::NUMERIC
+ELSE 0
+END)/SUM(sales::NUMERIC) * 100), 2) AS retail_sales_percentage
+,ROUND((SUM(CASE
+WHEN platform = 'Shopify' THEN sales::NUMERIC
+ELSE 0
+END)/SUM(sales::NUMERIC)), 2) AS shopify_sales_percentage
+FROM clean_weekly_sales
+GROUP BY month_number;
 
 -- What is the percentage of sales by demographic for each year in the dataset?
-
-select calendar_year
-,sum(case
-when demographic='Couples' then sales::numeric
-else 0
-end) as couples_sales
-,sum(case
-when demographic='Families' then sales::numeric
-else 0
-end) as families_sales
-,round((sum(case
-when demographic='Couples' then sales::numeric
-else 0
-end)/sum(sales::numeric)*100),2) as couples_sales_percentage
-,round((sum(case
-when demographic='Families' then sales::numeric
-else 0
-end)/sum(sales::numeric)),2) as families_sales_percentage
-from clean_weekly_sales
-group by calendar_year;
+SELECT calendar_year, 
+SUM(CASE
+WHEN demographic = 'Couples' THEN sales::NUMERIC
+ELSE 0
+END) AS couples_sales,
+SUM(CASE
+WHEN demographic = 'Families' THEN sales::NUMERIC
+ELSE 0
+END) AS families_sales,
+ROUND((SUM(CASE
+WHEN demographic = 'Couples' THEN sales::NUMERIC
+ELSE 0
+END)/SUM(sales::NUMERIC)*100), 2) AS couples_sales_percentage,
+ROUND((SUM(CASE
+WHEN demographic = 'Families' THEN sales::NUMERIC
+ELSE 0
+END)/SUM(sales::NUMERIC)), 2) AS families_sales_percentage
+FROM clean_weekly_sales
+GROUP BY calendar_year;
 
 -- Which age_band and demographic values contribute the most to Retail sales?
-
-select 
-age_band
-,demographic
-,sum(sales)
-from clean_weekly_sales
-group by age_band
-,demographic
-order by sum(sales) desc;
+SELECT age_band, demographic, SUM(sales)
+FROM clean_weekly_sales
+GROUP BY age_band, demographic
+ORDER BY SUM(sales)DESC;
 -- Retirees and families
 
 -- Can we use the avg_transaction column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?
-
-select calendar_year
-,avg(case
-when platform='Retail' then transactions::numeric
-else 0
-end) as avg_retail_transactions
-,avg(case
-when platform='Shopify' then transactions::numeric
-else 0
-end) as avg_shopify_transactions
-from clean_weekly_sales
-group by calendar_year;
+SELECT calendar_year, 
+ANG(CASE
+WHEN platform = 'Retail' THEN transactions::NUMERIC
+ELSE 0
+END) AS avg_retail_transactions,
+ANG(CASE
+WHEN platform = 'Shopify' THEN transactions::NUMERIC
+ELSE 0
+END) AS avg_shopify_transactions
+FROM clean_weekly_sales
+GROUP BY calendar_year;
 
 -- BEFORE AND AFTER ANALYSIS
 
 -- What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?
-
-select distinct week_number
-from clean_weekly_sales
-where week_date='2020-06-15' and calendar_year=2020;
+SELECT distinct week_number
+FROM clean_weekly_sales
+WHERE week_date = '2020-06-15' AND calendar_year = 2020;
 
 with cte as (
-select 
-week_date
-,week_number     
-,sum(sales::numeric) as total_sales
-from clean_weekly_sales
-where week_number between 21 and 28 and calendar_year=2020
-group by week_date
-,week_number
+SELECT week_date, week_number,
+SUM(sales::NUMERIC) AS total_sales
+FROM clean_weekly_sales
+WHERE week_number BETWEEN 21 AND 28 AND calendar_year = 2020
+GROUP BY week_date, week_number
+),
+before_after AS (
+SELECT
+SUM(CASE
+WHEN week_number BETWEEN 21 AND 24 THEN total_sales
+END) AS sales_before,
+SUM(CASE
+WHEN week_number BETWEEN 25 AND 28 THEN total_sales
+END) AS sales_after
+FROM cte
 )
-,before_after as (
-select
-sum(case
-when week_number between 21 and 24
-then total_sales
-end) as sales_before
-,sum(case
-when week_number between 25 and 28 then total_sales
-end) as sales_after
-from cte
-)
-select 
-sales_after-sales_before as growth
-,round(((sales_after-sales_before)/sales_before*100),2) as percentage
-from before_after;
+SELECT sales_after-sales_before AS growth,
+ROUND(((sales_after-sales_before)/sales_before * 100), 2) AS percentage
+FROM before_after;
 -- The sales decreased by $26884188, or 1.15%.
 
 -- What about the entire 12 weeks before and after?
-
-with cte as (
-select 
-week_date
-,week_number     
-,sum(sales::numeric) as total_sales
-from clean_weekly_sales
-where week_number between 13 and 37 and calendar_year=2020
-group by week_date
-,week_number
+WITH cte AS (
+SELECT week_date, week_number, 
+SUM(sales::NUMERIC) AS total_sales
+FROM clean_weekly_sales
+WHERE week_number BETWEEN 13 AND 37 AND calendar_year = 2020
+GROUP BY week_date, week_number
+),
+before_after AS (
+SELECT SUM(CASE
+WHEN week_number BETWEEN 13 AND 24 THEN total_sales
+END) AS sales_before,
+SUM(CASE
+WHEN week_number BETWEEN 25 AND 37 THEN total_sales
+END) AS sales_after
+FROM cte
 )
-,before_after as (
-select
-sum(case
-when week_number between 13 and 24
-then total_sales
-end) as sales_before
-,sum(case
-when week_number between 25 and 37 then total_sales
-end) as sales_after
-from cte
-)
-select 
-sales_after-sales_before as growth
-,round(((sales_after-sales_before)/sales_before*100),2) as percentage
-from before_after;
+SELECT sales_after-sales_before AS growth,
+ROUND(((sales_after-sales_before)/sales_before * 100), 2) AS percentage
+FROM before_after;
 -- The sales decreased by $152325394, or 2.14%.
 
 -- How do the sale metrics for these 2 periods before and after compare with the previous years in 2018 and 2019?
+WITH cte AS (
+SELECT calendar_year, week_number, SUM(sales::NUMERIC) AS total_sales
+FROM clean_weekly_sales
+WHERE week_number BETWEEN 21 AND 28
+GROUP BY calendar_year, week_number
+),
+before_after AS (
+SELECT calendar_year,
+SUM(CASE
+WHEN week_number BETWEEN 21 AND 24 THEN total_sales
+END) AS sales_before,
+SUM(CASE
+WHEN week_number BETWEEN 25 and 28 THEN total_sales
+END) AS sales_after
+FROM cte
+GROUP BY calendar_year
+)
+SELECT calendar_year, sales_after-sales_before AS growth, ROUND(((sales_after-sales_before)/sales_before * 100), 2) AS percentage
+FROM before_after;
 
-with cte as (
-select 
-calendar_year
-,week_number     
-,sum(sales::numeric) as total_sales
-from clean_weekly_sales
-where week_number between 21 and 28
-group by calendar_year
-,week_number
+WITH cte AS (
+SELECT calendar_year, week_number, SUM(sales::NUMERIC) AS total_sales
+FROM clean_weekly_sales
+WHERE week_number BETWEEN 13 AND 37
+GROUP BY calendar_year, week_number
+),
+before_after AS (
+SELECT calendar_year,
+SUM(CASE
+WHEN week_number BETWEEN 13 AND 24 THEN total_sales
+END) AS sales_before,
+SUM(CASE
+WHEN week_number BETWEEN 25 AND 37 THEN total_sales
+END) AS sales_after
+FROM cte
+GROUP BY calendar_year
 )
-,before_after as (
-select
-calendar_year
-,sum(case
-when week_number between 21 and 24
-then total_sales
-end) as sales_before
-,sum(case
-when week_number between 25 and 28 then total_sales
-end) as sales_after
-from cte
-group by calendar_year
-)
-select 
-calendar_year
-,sales_after-sales_before as growth
-,round(((sales_after-sales_before)/sales_before*100),2) as percentage
-from before_after;
-
-with cte as (
-select 
-calendar_year
-,week_number     
-,sum(sales::numeric) as total_sales
-from clean_weekly_sales
-where week_number between 13 and 37
-group by calendar_year
-,week_number
-)
-,before_after as (
-select
-calendar_year
-,sum(case
-when week_number between 13 and 24
-then total_sales
-end) as sales_before
-,sum(case
-when week_number between 25 and 37 then total_sales
-end) as sales_after
-from cte
-group by calendar_year
-)
-select 
-calendar_year
-,sales_after-sales_before as growth
-,round(((sales_after-sales_before)/sales_before*100),2) as percentage
-from before_after;
+SELECT calendar_year, sales_after-sales_before AS growth, ROUND(((sales_after-sales_before)/sales_before * 100), 2) AS percentage
+FROM before_after;

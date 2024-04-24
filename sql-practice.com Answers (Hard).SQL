@@ -67,7 +67,7 @@ FROM patients;
 -- Show the patient_id and total_spent for patients who spent over 150 in medication_cost. Sort by most total_spent to least total_spent.
 SELECT u.patient_id, SUM(m.medication_cost)
 FROM unit_dose_orders u
-JOIN medications m ON m.medication_id=u.medication_id
+JOIN medications m ON m.medication_id = u.medication_id
 GROUP BY patient_id
 HAVING SUM(m.medication_cost) > 150
 ORDER BY SUM(medication_cost) DESC;

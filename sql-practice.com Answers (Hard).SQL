@@ -1,4 +1,4 @@
--- Show all of the patients grouped into weight groups. Show the total amount of patients in each weight group. Order the list by the weight group decending.*/
+-- Show all of the patients grouped into weight groups. Show the total number of patients in each weight group. Order the list by the weight group decsending.
 SELECT COUNT(patient_id) AS patients_in_group, FLOOR(weight/10) * 10 AS weight_group
 FROM patients
 GROUP BY weight_group
@@ -12,14 +12,14 @@ ELSE 0
 END AS isObese
 FROM patients;
 
--- Show patient_id, first_name, last_name, and attending physician's specialty. Show only the patients who has a primary_diagnosis as 'Dementia' and the physician's first name is 'Lisa'.
+-- Show patient_id, first_name, last_name, and attending physician's specialty. Show only the patients who have a primary_diagnosis as 'Dementia' and the physician's first name is 'Lisa'.
 SELECT a.patient_id, p.first_name AS patient_first_name, p.last_name AS patient_last_name, ph.specialty as attending_physician_specialty
 FROM admissions a
 JOIN patients p USING(patient_id)
 JOIN physicians ph ON a.attending_physician_id = ph.physician_id
 WHERE a.primary_diagnosis = 'Dementia' AND ph.first_name = 'Lisa';
 
-/* All patients who have gone through admissions, can see their medical documents on our site. Those patients are given a temporary password after their first admission. Show the patient_id and temp_password.
+/* All patients who have gone through admissions can see their medical documents on our site. Those patients are given a temporary password after their first admission. Show the patient_id and temp_password.
 The password must be the following, in order:
 1. patient_id
 2. the numerical length of patient's last_name
@@ -40,14 +40,14 @@ END AS cost_after_insurance
 FROM admissions
 GROUP BY has_insurance;
 
--- Show the provinces that has more patients identified as 'M' than 'F'.
+-- Show the provinces that have more patients identified as 'M' than 'F'.
 SELECT province_name 
 FROM provinces 
 JOIN patients USING(province_id)
 GROUP BY province_name
 HAVING COUNT(CASE
 WHEN gender = 'M' THEN 1 
-END)/COUNT(CASE WHEN gender = 'F' THEN 1 END);
+END)/COUNT(CASE WHEN gender = 'F' THEN 1 END) > 1;
 
 /* We are looking for a specific patient. Pull all columns for the patient who matches the following criteria:
 - First_name contains an 'r' after the first two letters
@@ -58,7 +58,7 @@ END)/COUNT(CASE WHEN gender = 'F' THEN 1 END);
 - They are from the city 'Halifax' */
 SELECT * 
 FROM patients
-WHERE first_name LIKE '__r%' AND gender='F' AND MONTH(birth_date) IN (2,5,12) AND weight BETWEEN 60 AND 80 AAND patient_id % 2 <> 0 AND city = 'Halifax';
+WHERE first_name LIKE '__r%' AND gender='F' AND MONTH(birth_date) IN (2, 5, 12) AND weight BETWEEN 60 AND 80 AND patient_id % 2 <> 0 AND city = 'Halifax';
 
 -- Show the percent of patients that have 'M' as their gender. Round the answer to the nearest hundreth number and in percent form.
 SELECT CONCAT(ROUND((SELECT COUNT(*) FROM patients WHERE gender = 'M')/CAST(COUNT(*) AS FLOAT), 4) * 100, %) AS percent_of_male_patients
@@ -77,7 +77,7 @@ SELECT item_description, ROUND(quantity_on_hand * item_cost, 0), v.vendor_name
 FROM items i
 JOIN vendors v ON v.vendor_id = i.primary_vendor_id;
 
--- For each day display the total amount of admissions on that day. Display the amount changed from the previous date.
+-- For each day display the total number of admissions on that day. Display the amount changed from the previous date.
 WITH admission_counts_table AS (
 SELECT admission_date, COUNT(patient_id) AS admission_count
 FROM admissions

@@ -1,46 +1,46 @@
--- Show unique birth years from patients and order them by ascending.
+-- Show unique birth years from patients in an ascending order.
 SELECT DISTINCT year(birth_date)
 FROM patients
 ORDER BY YEAR(birth_date);
 
--- Show unique first names from the patients table which only occurs once in the list.
+-- Show unique first names from the patients table which only occur once in the list.
 SELECT first_name
 FROM patients
 GROUP BY first_name
 HAVING COUNT(*) = 1;
 
--- Show patient_id and first_name from patients where their first_name start and ends with 's' and is at least 6 characters long.
+-- Show patient_id and first_name from patients where their first_name starts and ends with 's' and is at least 6 characters long.
 SELECT patient_id, first_name
 FROM patients
 WHERE first_name LIKE 'S____%s';
 
--- Show patient_id, first_name, last_name from patients whos primary_diagnosis is 'Dementia'.
+-- Show patient_id, first_name, last_name from patients whose primary_diagnosis is 'Dementia'.
 SELECT patient_id, first_name, last_name
 FROM patients 
 JOIN admissions USING(patient_id) 
 WHERE primary_diagnosis = 'Dementia';
 
--- Display every patient's first_name. Order the list by the length of each name and then by alphbetically.
+-- Display every patient's first_name. Order the list by the length of each name and then alphbetically.
 SELECT first_name
 FROM patients
 ORDER BY LENGTH(first_name), first_name;
 
--- Show the total amount of male patients and the total amount of female patients in the patients table. Display the two results in the same row.
+-- Show the total number of male patients and the total number of female patients in the patients table. Display the two results in the same row.
 SELECT COUNT(CASE
 WHEN gender = 'M' THEN 1)
-END AS male_count,
+END) AS male_count,
 COUNT(CASE
 WHEN gender = 'F' THEN 1 
 END) AS female_count
 FROM patients;
 
--- Show first and last name, allergies from patients which have allergies to either 'Penicillin' or 'Morphine'. Show results ordered ascending by allergies then by first_name then by last_name.
+-- Show the first name, last name, and allergies from patients which have allergies to either 'Penicillin' or 'Morphine'. Show results ordered ascendingly by allergies, then by first_name, then by last_name.
 SELECT first_name, last_name, allergies
 FROM patients
-WHERE allergies IN ('Penicillin','Morphine')
-ORDER BY  allergies, first_name, last_name;
+WHERE allergies IN ('Penicillin', 'Morphine')
+ORDER BY allergies, first_name, last_name;
 
--- Show patient_id, primary_diagnosis from admissions. Find patients admitted multiple times for the same primary_diagnosis.
+-- Show patient_id and primary_diagnosis from admissions. Find patients admitted multiple times for the same primary_diagnosis.
 SELECT patient_id, primary_diagnosis
 FROM admissions
 GROUP BY patient_id, primary_diagnosis
@@ -52,7 +52,7 @@ FROM patients
 GROUP BY city
 ORDER BY COUNT(patient_id) DESC;
 
--- Show first name, last name and role of every person that is either patient or physician.
+-- Show first name, last name, and role of every person who is either a patient or physician.
 SELECT first_name, last_name,
 CASE
 WHEN patient_id IS NOT NULL THEN 'Patient'
@@ -65,14 +65,14 @@ WHEN physician_id IS NOT NULL THEN 'Physician'
 END AS role
 FROM physicians;
 
--- Show all allergies ordered by popularity. Remove 'NKA' and NULL values from query.
+-- Show all allergies ordered by popularity. Remove NKA and null values from query.
 SELECT allergies, COUNT(allergies)
 FROM patients
 WHERE allergies IS NOT NULL AND allergies <> 'NKA'
 GROUP BY allergies
 ORDER BY COUNT(allergies) DESC;
 
--- Show all patient's first_name, last_name, and birth_date who were born in the 1970s decade. Sort the list starting from the earliest birth_date.
+-- Show all patients' first_name, last_name, and birth_date who were born in the 1970s decade. Sort the list starting from the earliest birth_date.
 SELECT first_name, last_name, birth_date
 FROM patients
 WHERE birth_date BETWEEN '1970-01-01' AND '1979-12-31'
@@ -118,7 +118,7 @@ GROUP BY nursing_unit_id;
 2. attending_physician_id contains a 2 and the length of patient_id is 3 characters. */
 SELECT patient_id, attending_physician_id, primary_diagnosis
 FROM admissions
-WHERE (patient_id % 2 <> 0 AND attending_physician_id IN (1,5,19)) OR (attending_physician_id LIKE '%2%' AND LENGTH(patient_id) = 3);
+WHERE (patient_id % 2 <> 0 AND attending_physician_id IN (1, 5, 19)) OR (attending_physician_id LIKE '%2%' AND LENGTH(patient_id) = 3);
 
 -- Show first_name, last_name, and the total amount of admissions attended for each physician.
 SELECT first_name, last_name, COUNT(patient_id) AS total_amount_of_admissions_attended
@@ -127,7 +127,7 @@ JOIN admissions a ON p.physician_id = a.attending_physician_id
 GROUP BY physician_id;
 
 -- For each physician, display their id, full name, and the first and last admission date they attended.
-SELECT physician_id, CONCAT(first_name,' ',last_name) AS full_name, MAX(a.admission_date), MIN(a.admission_date)
+SELECT physician_id, CONCAT(first_name, ' ', last_name) AS full_name, MAX(a.admission_date), MIN(a.admission_date)
 FROM physicians p
 JOIN admissions a ON p.physician_id = a.attending_physician_id
 GROUP BY physician_id;

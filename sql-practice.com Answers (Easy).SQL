@@ -1,9 +1,9 @@
--- Show first name, last name, and gender of patients who's gender is 'M'.
+-- Show first name, last name, and gender of patients whose gender is 'M'.
 SELECT first_name, last_name, gender
 FROM patients
 WHERE gender = 'M';
 
--- Show first name and last name of patients who does not have allergies (null).
+-- Show first name and last name of patients who do does not have allergies (null).
 SELECT first_name, last_name
 FROM patients
 WHERE allergies is null;
@@ -13,18 +13,18 @@ SELECT first_name
 FROM patients
 WHERE first_name like 'C%';
 
--- Show first name and last name of patients that weight within the range of 100 to 120 (inclusive).
+-- Show first name and last name of patients that weigh within the range of 100 to 120 (inclusive).
 SELECT first_name, last_name
 FROM patients
 WHERE weight BETWEEN 100 AND 120;
 
--- Update the patients table for the allergies column. If the patient's allergies is null then replace it with 'NKA'.
+-- Update the patients table for the allergies column. If the patient's allergies is null, replace it with 'NKA'.
 UPDATE patients
 SET allergies = 'NKA'
 WHERE allergies IS NULL;
 
--- Show first name and last name concatinated into one column to show their full name.
-SELECT CONCAT(first_name,' ',last_name) AS full_name
+-- Show first name and last name concatenated into one column to show their full name.
+SELECT CONCAT(first_name, ' ', last_name) AS full_name
 FROM patients;
 
 -- Show first name, last name, and the full province name of each patient.
@@ -33,17 +33,17 @@ FROM patients a
 JOIN provinces r USING(province_id);
 
 -- Show how many patients have a birth_date with 2010 as the birth year.
-SELECT count(distinct patient_id)
+SELECT COUNT(DISTINCT patient_id)
 FROM patients
-where year(birth_date)=2010;
+where year(birth_date) = 2010;
 
 -- Show the first_name, last_name, and height of the patient with the greatest height.
 SELECT first_name, last_name, MAX(height)
 FROM patients;
 
--- Show all columns for patients who have one of the following patient_ids: 1,45,534,879,1000.
+-- Show all columns for patients who have one of the following patient_ids: 1, 45, 534, 879, or 1000.
 SELECT * FROM patients
-WHERE patient_id IN (1,45,534,879,1000);
+WHERE patient_id IN (1, 45, 534, 879, 1000);
 
 -- Show the total number of admissions.
 SELECT COUNT(patient_id) FROM admissions;
@@ -58,16 +58,16 @@ FROM admissions
 WHERE patient_id = 573;
 
 -- Based on the cities that our patients live in, show unique cities that are in province_id 'NS'.
-SELECT distinct(city)
+SELECT DISTINCT(city)
 FROM patients
 WHERE province_id = 'NS';
 
--- Write a query to find the first_name, last name and birth date of patients who have height more than 160 and weight more than 70.
+-- Write a query to find the first_name, las,t name and birth date of patients who have A height more than 160 and weight more than 70.
 SELECT first_name, last_name, birth_date
 FROM patients
 WHERE height > 160 AND weight > 70;
 
--- Write a query to find list of patients first_name, last_name, and allergies from Hamilton where allergies are not nka or null.
+-- Write a query to get a list of patients' first_name, last_name, and allergies from Hamilton where allergies are not NKA or null.
 SELECT first_name, last_name, allergies
 FROM patients
 WHERE city = 'Hamilton' AND allergies <> 'NKA';

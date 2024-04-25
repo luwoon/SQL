@@ -1,7 +1,6 @@
 -- Schema SQL at https://8weeksqlchallenge.com/case-study-8/
 
 -- DATA EXPLORATION AND CLEANING
-
 -- Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month.
 ALTER TABLE fresh_segments.interest_metrics
 ALTER COLUMN month_year TYPE VARCHAR(20);
@@ -58,7 +57,6 @@ SELECT * FROM fresh_segments.interest_metrics e
 LEFT JOIN fresh_segments.interest_map a ON e.interest_id::integer = a.id;
 
 -- INTEREST ANALYSIS
-
 -- Which interests have been present in all month_year dates in our dataset?
 SELECT COUNT(DISTINCT month_year)
 FROM fresh_segments.interest_metrics;
@@ -88,7 +86,6 @@ FROM count_cte;
 -- After removing these interests, how many unique interests are there for each month?
 
 -- SEGMENT ANALYSIS
-
 -- Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
 WITH filtered_cte AS (
 SELECT interest_id, COUNT(DISTINCT month_year) AS total_months

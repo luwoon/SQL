@@ -1,10 +1,10 @@
 -- In 11.sql, list the titles of episodes from season 5, in reverse alphabetical order.
 
 SELECT
-  "title"
+  title
 FROM
-  "episodes"
+  episodes
 WHERE
-  "season" = 5
+  season = 5
 ORDER BY
-  "title" DESC;
+  title DESC;

@@ -1,8 +1,8 @@
 -- In 3.sql, find the production code for the episode “Hackerized!”.
 
 SELECT
-  "production_code"
+  production_code
 FROM
-  "episodes"
+  episodes
 WHERE
-  "title" = "Hackerized!";
+  title = "Hackerized!";

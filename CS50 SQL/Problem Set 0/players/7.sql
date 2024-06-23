@@ -1,16 +1,13 @@
 -- In 7.sql, write a SQL query to count the number of players who bat (or batted) right-handed and throw (or threw) left-handed, or vice versa.
 
 SELECT
-  COUNT("id")
+  COUNT(id)
 FROM
-  "players"
+  players
 WHERE
   (
-    "bats" = "R"
-    AND "throws" = "L"
+    bats = "R" AND throws = "L"
   )
   OR (
-    "bats" = "L"
-    AND "throw
-s" = "R"
+    bats = "L" AND throws = "R"
   );

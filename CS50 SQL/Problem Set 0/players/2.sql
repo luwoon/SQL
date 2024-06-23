@@ -1,9 +1,9 @@
 -- In 2.sql, write a SQL query to find the side Babe Ruth hit.
 
 SELECT
-  "bats"
+  bats
 FROM
-  "players"
+  players
 WHERE
-  "first_name" = "Babe"
-  AND "last_name" = "Ruth";
+  first_name = "Babe"
+  AND last_name = "Ruth";

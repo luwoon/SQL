@@ -1,8 +1,8 @@
 -- In 1.sql, write a SQL query to list the titles of all episodes in Cyberchase’s original season, Season 1.
 
 SELECT
-  "title"
+  title
 FROM
-  "episodes"
+  episodes
 WHERE
-  "season" = 1;
+  season = 1;

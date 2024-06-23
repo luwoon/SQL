@@ -1,18 +1,18 @@
 -- Write a single SQL query to list the first and last names of all players of above average height, sorted tallest to shortest, then by first and last name.
 
 SELECT
-  "first_name",
-  "last_name"
+  first_name,
+  last_name
 FROM
-  "players"
+  players
 WHERE
-  "height" > (
+  height > (
     SELECT
-      AVG("height")
+      AVG(height)
     FROM
-      "players"
+      players
   )
 ORDER BY
-  "height" DESC,
-  "first_name",
-  "last_name";
+  height DESC,
+  first_name,
+  last_name;

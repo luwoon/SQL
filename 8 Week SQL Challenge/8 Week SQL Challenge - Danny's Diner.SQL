@@ -75,7 +75,7 @@ ORDER BY 1;
 
 -- 8. What is the total items and amount spent for each member before they became a member?
 
-SELECT s.customer_id, COUNT(s.product_id) AS total_items_before_member, SUM(e.price) as total_spent_before_member
+SELECT s.customer_id, COUNT(s.product_id) AS total_items_before_member, SUM(e.price) AS total_spent_before_member
 FROM dannys_diner.sales s
 JOIN dannys_diner.members m USING(customer_id)
 JOIN dannys_diner.menu e USING(product_id)

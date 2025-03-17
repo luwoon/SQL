@@ -16,7 +16,7 @@ ORDER BY 1;
 -- 3. What was the first item from the menu purchased by each customer?
 
 WITH ranked_orders AS (
-  SELECT *, RANK() OVER (PARTITION BY customer_id ORDER BY order_date) as rank
+  SELECT *, RANK() OVER (PARTITION BY customer_id ORDER BY order_date) AS rank
   FROM dannys_diner.sales
 )
 SELECT customer_id, order_date, product_name AS first_item
@@ -37,7 +37,7 @@ LIMIT 1;
 -- 5. Which item was the most popular for each customer?
 
 WITH most_popular AS (
-  SELECT customer_id, product_id, RANK() OVER (PARTITION BY customer_id ORDER BY COUNT(product_id) DESC) as rank
+  SELECT customer_id, product_id, RANK() OVER (PARTITION BY customer_id ORDER BY COUNT(product_id) DESC) AS rank
   FROM dannys_diner.sales
   GROUP BY 1, 2
 )

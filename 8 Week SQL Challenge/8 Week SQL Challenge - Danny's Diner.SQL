@@ -123,7 +123,7 @@ WITH join_cte AS (
   JOIN dannys_diner.menu m USING(product_id)
   LEFT JOIN dannys_diner.members e USING(customer_id)
   ORDER BY 1, 2, 3)
-SELECT *, CASE WHEN member = 'N' THEN null ELSE RANK() OVER(PARTITION BY customer_id, member ORDER BY order_date) END AS ranking
+SELECT *, CASE WHEN member = 'N' THEN NULL ELSE RANK() OVER(PARTITION BY customer_id, member ORDER BY order_date) END AS ranking
 FROM join_cte;
 GROUP BY 1
 ORDER BY 1;

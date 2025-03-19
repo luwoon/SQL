@@ -64,11 +64,20 @@ ORDER BY 1;
 
 -- 8. How many pizzas were delivered that had both exclusions and extras?
 
+SELECT COUNT(*) AS both_exclusions_and_extras
+FROM pizza_runner.customer_orders
+JOIN pizza_runner.runner_orders USING(order_id)
+WHERE duration <> 'null' AND exclusions <> '' AND exclusions <> 'null' AND extras <> '';
 
 -- 9. What was the total volume of pizzas ordered for each hour of the day?
 
+SELECT EXTRACT(HOUR FROM order_time) AS hour, COUNT(*) AS order_volume
+FROM pizza_runner.customer_orders
+GROUP BY 1
+ORDER BY 1;
 
 -- 10. What was the volume of orders for each day of the week?
 
-
--- 10. What was the volume of orders for each day of the week?
+SELECT TO_CHAR(order_time, 'day') AS day_of_week, COUNT(*) AS order_volume
+FROM pizza_runner.customer_orders
+GROUP BY 1;

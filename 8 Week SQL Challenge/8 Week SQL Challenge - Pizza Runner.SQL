@@ -118,7 +118,7 @@ WHERE duration <> 'null';
 
 -- What was the average speed for each runner for each delivery and do you notice any trend for these values?
 
-SELECT runner_id, order_id, ROUND((((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric)/(REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric))) ,2) AS speed
+SELECT runner_id, order_id, ROUND((((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric)/(REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric))), 2) AS speed
 FROM pizza_runner.runner_orders
 WHERE distance <> 'null'
 ORDER BY 1;
@@ -129,5 +129,3 @@ SELECT runner_id, ROUND((SUM(CASE WHEN distance <> 'null' THEN 1 END) * 100.00 /
 FROM pizza_runner.runner_orders
 GROUP BY 1
 ORDER BY 1;
-FROM pizza_runner.customer_orders
-GROUP BY 1;

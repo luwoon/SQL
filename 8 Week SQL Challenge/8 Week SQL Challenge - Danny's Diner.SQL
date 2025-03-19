@@ -105,6 +105,25 @@ WITH points_cte AS (
   WHERE order_date < '2021-02-01'
 )
 SELECT customer_id, SUM(points) AS total_points
-FROM points_cte
+FROM points_cte;
+
+-- 11. Join all the things.
+
+SELECT s.customer_id, order_date, product_name, price, CASE WHEN join_date <= order_date THEN 'Y' ELSE 'N' END AS member
+FROM dannys_diner.sales s
+JOIN dannys_diner.menu m USING(product_id)
+LEFT JOIN dannys_diner.members e USING(customer_id)
+ORDER BY 1, 2, 3;
+
+-- 12.Rank all the things.
+
+WITH join_cte AS (
+  SELECT s.customer_id, order_date, product_name, price, CASE WHEN join_date <= order_date THEN 'Y' ELSE 'N' END AS member
+  FROM dannys_diner.sales s
+  JOIN dannys_diner.menu m USING(product_id)
+  LEFT JOIN dannys_diner.members e USING(customer_id)
+  ORDER BY 1, 2, 3)
+SELECT *, CASE WHEN member = 'N' THEN null ELSE RANK() OVER(PARTITION BY customer_id, member ORDER BY order_date) END AS ranking
+FROM join_cte;
 GROUP BY 1
 ORDER BY 1;

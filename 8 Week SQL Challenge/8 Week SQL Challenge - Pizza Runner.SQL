@@ -79,5 +79,55 @@ ORDER BY 1;
 -- What was the volume of orders for each day of the week?
 
 SELECT TO_CHAR(order_time, 'day') AS day_of_week, COUNT(*) AS order_volume
+
+-- Runner and Customer Experience
+-- How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
+
+SELECT CEILING(EXTRACT(DAY FROM registration_date)/7) AS week_number, COUNT(*) AS runners_signed_up
+FROM pizza_runner.runners
+GROUP BY 1
+ORDER BY 1;
+
+-- What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
+
+SELECT runner_id, ROUND((AVG(EXTRACT(EPOCH FROM (pickup_time::timestamp - order_time::timestamp))/60)::numeric), 2) AS avg_time
+FROM pizza_runner.customer_orders
+JOIN pizza_runner.runner_orders USING(order_id)
+WHERE pickup_time <> 'null'
+GROUP BY 1
+ORDER BY 1;
+
+-- What was the average distance travelled for each customer?
+
+WITH distinct_cte AS (
+  SELECT DISTINCT order_id, customer_id, distance
+  FROM pizza_runner.customer_orders
+  JOIN pizza_runner.runner_orders USING(order_id)
+  WHERE distance <> 'null'
+)
+SELECT customer_id, ROUND((AVG((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g'))::numeric)), 2) AS avg_distance
+FROM distinct_cte
+GROUP BY 1
+ORDER BY 1;
+
+-- What was the difference between the longest and shortest delivery times for all orders?
+
+SELECT MAX(REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::int) - MIN(REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::int) AS difference
+FROM pizza_runner.runner_orders
+WHERE duration <> 'null';
+
+-- What was the average speed for each runner for each delivery and do you notice any trend for these values?
+
+SELECT runner_id, order_id, ROUND((((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric)/(REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric))) ,2) AS speed
+FROM pizza_runner.runner_orders
+WHERE distance <> 'null'
+ORDER BY 1;
+
+-- What is the successful delivery percentage for each runner?
+
+SELECT runner_id, ROUND((SUM(CASE WHEN distance <> 'null' THEN 1 END) * 100.00 / COUNT(*)), 2) AS successful_delivery_percentage
+FROM pizza_runner.runner_orders
+GROUP BY 1
+ORDER BY 1;
 FROM pizza_runner.customer_orders
 GROUP BY 1;

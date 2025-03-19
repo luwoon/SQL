@@ -83,14 +83,14 @@ SELECT TO_CHAR(order_time, 'day') AS day_of_week, COUNT(*) AS order_volume
 -- Runner and Customer Experience
 -- How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
 
-SELECT CEILING(EXTRACT(DAY FROM registration_date)/7) AS week_number, COUNT(*) AS runners_signed_up
+SELECT CEILING(EXTRACT(DAY FROM registration_date) / 7) AS week_number, COUNT(*) AS runners_signed_up
 FROM pizza_runner.runners
 GROUP BY 1
 ORDER BY 1;
 
 -- What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
 
-SELECT runner_id, ROUND((AVG(EXTRACT(EPOCH FROM (pickup_time::timestamp - order_time::timestamp))/60)::numeric), 2) AS avg_time
+SELECT runner_id, ROUND((AVG(EXTRACT(EPOCH FROM (pickup_time::timestamp - order_time::timestamp)) / 60)::numeric), 2) AS avg_time
 FROM pizza_runner.customer_orders
 JOIN pizza_runner.runner_orders USING(order_id)
 WHERE pickup_time <> 'null'
@@ -118,7 +118,7 @@ WHERE duration <> 'null';
 
 -- What was the average speed for each runner for each delivery and do you notice any trend for these values?
 
-SELECT runner_id, order_id, ROUND((((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric)/(REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric))), 2) AS speed
+SELECT runner_id, order_id, ROUND((((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric) / (REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric))), 2) AS speed
 FROM pizza_runner.runner_orders
 WHERE distance <> 'null'
 ORDER BY 1;

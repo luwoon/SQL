@@ -127,5 +127,68 @@ ORDER BY 1;
 
 SELECT runner_id, ROUND((SUM(CASE WHEN distance <> 'null' THEN 1 END) * 100.00 / COUNT(*)), 2) AS successful_delivery_percentage
 FROM pizza_runner.runner_orders
-GROUP BY 1
-ORDER BY 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Ingredient Optimisation
+-- What was the most commonly added extra?
+
+WITH frequency_cte AS (
+  SELECT unnest(string_to_array(extras, ', ')) AS extra, COUNT(*) AS frequency
+  FROM pizza_runner.customer_orders
+  GROUP BY 1
+)
+SELECT topping_name, frequency
+FROM frequency_cte
+JOIN pizza_runner.pizza_toppings ON topping_id::text = extra
+ORDER BY 2 DESC;
+
+-- What was the most common exclusion?
+
+WITH frequency_cte AS (
+  SELECT unnest(string_to_array(exclusions, ', ')) AS exclusion, COUNT(*) AS frequency
+  FROM pizza_runner.customer_orders
+  GROUP BY 1
+)
+SELECT topping_name, frequency
+FROM frequency_cte
+JOIN pizza_runner.pizza_toppings ON topping_id::text = exclusion
+ORDER BY 2 DESC;
+
+-- Generate an order item for each record in the customer_orders table.
+
+WITH order_cte AS (
+  SELECT order_id, customer_id, c.pizza_id, pizza_name, SPLIT_PART(exclusions, ', ', 1) AS exclusion_id_one, SPLIT_PART(exclusions, ', ', 2) AS exclusion_id_two, SPLIT_PART(extras, ', ', 1) AS extra_id_one, SPLIT_PART(extras, ', ', 2) AS extra_id_two
+  FROM pizza_runner.customer_orders c
+  JOIN pizza_runner.pizza_names p USING(pizza_id)
+)
+SELECT *, p1.topping_id AS exclusion_one_id, p1.topping_name AS exclusion_one_name,    p2.topping_id AS exclusion_two_id, 
+    p2.topping_name AS exclusion_two_name,
+    
+    p3.topping_id AS extra_one_id, 
+    p3.topping_name AS extra_one_name, 
+    
+    p4.topping_id AS extra_two_id, 
+    p4.topping_name AS extra_two_name
+FROM order_cte o
+LEFT JOIN pizza_runner.pizza_toppings p1 ON o.exclusion_id_one = p1.topping_id::text
+LEFT JOIN pizza_runner.pizza_toppings p2 ON o.exclusion_id_two = p2.topping_id::text
+LEFT JOIN pizza_runner.pizza_toppings p3 ON o.extra_id_one = p3.topping_id::text
+LEFT JOIN pizza_runner.pizza_toppings p4 ON o.extra_id_two = p4.topping_id::text;
+
+
+-- Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients.
+
+
+-- What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?

@@ -163,12 +163,12 @@ WITH order_cte AS (
   FROM pizza_runner.customer_orders c
   JOIN pizza_runner.pizza_names p USING(pizza_id)
 ), concat_cte AS (
-	SELECT order_id, customer_id, pizza_name, CASE WHEN p1.topping_name IS NULL THEN NULL ELSE CONCAT(' - Exclude ', p1.topping_name) END AS exclusion_one_name, CASE WHEN p2.topping_name IS NULL THEN NULL ELSE CONCAT(', ', p2.topping_name) END AS exclusion_two_name, CASE WHEN p3.topping_name IS NULL THEN NULL ELSE CONCAT(' - Extra ', p3.topping_name) END AS extra_one_name, CASE WHEN p4.topping_name IS NULL THEN NULL ELSE CONCAT(', ', p4.topping_name) END AS extra_two_name
-	FROM order_cte o
-	LEFT JOIN pizza_runner.pizza_toppings p1 ON o.exclusion_id_one = p1.topping_id::text
-	LEFT JOIN pizza_runner.pizza_toppings p2 ON o.exclusion_id_two = p2.topping_id::text
-	LEFT JOIN pizza_runner.pizza_toppings p3 ON o.extra_id_one = p3.topping_id::text
-	LEFT JOIN pizza_runner.pizza_toppings p4 ON o.extra_id_two = p4.topping_id::text
+  SELECT order_id, customer_id, pizza_name, CASE WHEN p1.topping_name IS NULL THEN NULL ELSE CONCAT(' - Exclude ', p1.topping_name) END AS exclusion_one_name, CASE WHEN p2.topping_name IS NULL THEN NULL ELSE CONCAT(', ', p2.topping_name) END AS exclusion_two_name, CASE WHEN p3.topping_name IS NULL THEN NULL ELSE CONCAT(' - Extra ', p3.topping_name) END AS extra_one_name, CASE WHEN p4.topping_name IS NULL THEN NULL ELSE CONCAT(', ', p4.topping_name) END AS extra_two_name
+  FROM order_cte o
+  LEFT JOIN pizza_runner.pizza_toppings p1 ON o.exclusion_id_one = p1.topping_id::text
+  LEFT JOIN pizza_runner.pizza_toppings p2 ON o.exclusion_id_two = p2.topping_id::text
+  LEFT JOIN pizza_runner.pizza_toppings p3 ON o.extra_id_one = p3.topping_id::text
+  LEFT JOIN pizza_runner.pizza_toppings p4 ON o.extra_id_two = p4.topping_id::text
 )
 SELECT order_id, customer_id, CONCAT(pizza_name, exclusion_one_name, exclusion_two_name, extra_one_name, extra_two_name) 
 FROM concat_cte
@@ -182,18 +182,18 @@ WITH split_cte AS (
   JOIN pizza_runner.pizza_names p USING(pizza_id)
   LEFT JOIN pizza_runner.pizza_recipes USING(pizza_id)
 ), ingredients_cte AS (
-	SELECT order_id, pizza_id, pizza_name, exclusion_id_one, exclusion_id_two, extra_id_one, extra_id_two, topping_1, topping_2, topping_3, topping_4, topping_5, topping_6, topping_7, topping_8, p1.topping_name AS topping_1_name, p2.topping_name AS topping_2_name, p3.topping_name AS topping_3_name, p4.topping_name AS topping_4_name, p5.topping_name AS topping_5_name, p6.topping_name AS topping_6_name, p7.topping_name AS topping_7_name, p8.topping_name AS topping_8_name
-	FROM split_cte s
-  	LEFT JOIN pizza_runner.pizza_toppings p1 ON s.topping_1 = p1.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p2 ON s.topping_2 = p2.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p3 ON s.topping_3 = p3.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p4 ON s.topping_4 = p4.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p5 ON s.topping_5 = p5.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p6 ON s.topping_6 = p6.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p7 ON s.topping_7 = p7.topping_id::text 
-  	LEFT JOIN pizza_runner.pizza_toppings p8 ON s.topping_8 = p8.topping_id::text
+  SELECT order_id, pizza_id, pizza_name, exclusion_id_one, exclusion_id_two, extra_id_one, extra_id_two, topping_1, topping_2, topping_3, topping_4, topping_5, topping_6, topping_7, topping_8, p1.topping_name AS topping_1_name, p2.topping_name AS topping_2_name, p3.topping_name AS topping_3_name, p4.topping_name AS topping_4_name, p5.topping_name AS topping_5_name, p6.topping_name AS topping_6_name, p7.topping_name AS topping_7_name, p8.topping_name AS topping_8_name
+  FROM split_cte s
+    LEFT JOIN pizza_runner.pizza_toppings p1 ON s.topping_1 = p1.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p2 ON s.topping_2 = p2.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p3 ON s.topping_3 = p3.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p4 ON s.topping_4 = p4.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p5 ON s.topping_5 = p5.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p6 ON s.topping_6 = p6.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p7 ON s.topping_7 = p7.topping_id::text 
+    LEFT JOIN pizza_runner.pizza_toppings p8 ON s.topping_8 = p8.topping_id::text
 ), final_cte AS (
-	SELECT order_id, pizza_name, 
+  SELECT order_id, pizza_name, 
   CASE WHEN topping_1 = exclusion_id_one OR topping_1 = exclusion_id_two THEN NULL WHEN topping_1 = extra_id_one OR topping_1 = extra_id_two THEN CONCAT('2x', topping_1_name) ELSE topping_1_name END AS topping_1_final, 
   CASE WHEN topping_2 = exclusion_id_one OR topping_2 = exclusion_id_two THEN NULL WHEN topping_2 = extra_id_one OR topping_2 = extra_id_two THEN CONCAT('2x', topping_2_name) ELSE topping_2_name END AS topping_2_final, 
   CASE WHEN topping_3 = exclusion_id_one OR topping_3 = exclusion_id_two THEN NULL WHEN topping_3 = extra_id_one OR topping_3 = extra_id_two THEN CONCAT('2x', topping_3_name) ELSE topping_3_name END AS topping_3_final, 

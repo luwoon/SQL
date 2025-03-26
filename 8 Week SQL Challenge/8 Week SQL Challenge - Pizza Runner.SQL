@@ -210,7 +210,44 @@ ORDER BY 1;
 
 -- What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
 
-
-
-
-
+WITH split_cte AS (
+  SELECT order_id, c.pizza_id, pizza_name, SPLIT_PART(exclusions, ', ', 1) AS exclusion_id_one, SPLIT_PART(exclusions, ', ', 2) AS exclusion_id_two, SPLIT_PART(extras, ', ', 1) AS extra_id_one, SPLIT_PART(extras, ', ', 2) AS extra_id_two, SPLIT_PART(toppings, ', ', 1) AS topping_1, SPLIT_PART(toppings, ', ', 2) AS topping_2, SPLIT_PART(toppings, ', ', 3) AS topping_3, SPLIT_PART(toppings, ', ', 4) AS topping_4, SPLIT_PART(toppings, ', ', 5) AS topping_5, SPLIT_PART(toppings, ', ', 6) AS topping_6, SPLIT_PART(toppings, ', ', 7) AS topping_7, SPLIT_PART(toppings, ', ', 8) AS topping_8
+  FROM pizza_runner.customer_orders c
+  JOIN pizza_runner.pizza_names p USING(pizza_id)
+  LEFT JOIN pizza_runner.pizza_recipes USING(pizza_id)
+), exclude_cte AS (
+  SELECT *, 
+  CASE WHEN topping_1 = exclusion_id_one OR topping_1 = exclusion_id_two THEN NULL ELSE topping_1 END AS topping_1_final,
+  CASE WHEN topping_2 = exclusion_id_one OR topping_2 = exclusion_id_two THEN NULL ELSE topping_2 END AS topping_2_final,
+  CASE WHEN topping_3 = exclusion_id_one OR topping_3 = exclusion_id_two THEN NULL ELSE topping_3 END AS topping_3_final,
+  CASE WHEN topping_4 = exclusion_id_one OR topping_4 = exclusion_id_two THEN NULL ELSE topping_4 END AS topping_4_final,
+  CASE WHEN topping_5 = exclusion_id_one OR topping_5 = exclusion_id_two THEN NULL ELSE topping_5 END AS topping_5_final,
+  CASE WHEN topping_6 = exclusion_id_one OR topping_6 = exclusion_id_two THEN NULL ELSE topping_6 END AS topping_6_final,
+  CASE WHEN topping_7 = exclusion_id_one OR topping_7 = exclusion_id_two THEN NULL ELSE topping_7 END AS topping_7_final,
+  CASE WHEN topping_8 = exclusion_id_one OR topping_8 = exclusion_id_two THEN NULL ELSE topping_8 END AS topping_8_final
+  FROM split_cte
+)
+SELECT topping_name, COUNT(*) AS topping_count
+FROM (SELECT topping_1_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_2_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_3_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_4_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_5_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_6_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_7_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT topping_8_final AS topping FROM exclude_cte
+  UNION ALL
+  SELECT extra_id_one AS topping FROM exclude_cte
+  UNION ALL
+  SELECT extra_id_two AS topping FROM exclude_cte
+  ) AS all_toppings
+JOIN pizza_runner.pizza_toppings ON topping_id::text = topping
+GROUP BY 1
+ORDER BY 2 DESC;

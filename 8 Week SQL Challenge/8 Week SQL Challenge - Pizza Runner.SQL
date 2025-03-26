@@ -129,19 +129,9 @@ SELECT runner_id, ROUND((SUM(CASE WHEN distance <> 'null' THEN 1 END) * 100.00 /
 FROM pizza_runner.runner_orders
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 -- Ingredient Optimisation
+-- What are the standard ingredients for each pizza?
+
 -- What was the most commonly added extra?
 
 WITH frequency_cte AS (
@@ -172,23 +162,55 @@ WITH order_cte AS (
   SELECT order_id, customer_id, c.pizza_id, pizza_name, SPLIT_PART(exclusions, ', ', 1) AS exclusion_id_one, SPLIT_PART(exclusions, ', ', 2) AS exclusion_id_two, SPLIT_PART(extras, ', ', 1) AS extra_id_one, SPLIT_PART(extras, ', ', 2) AS extra_id_two
   FROM pizza_runner.customer_orders c
   JOIN pizza_runner.pizza_names p USING(pizza_id)
+), concat_cte AS (
+	SELECT order_id, customer_id, pizza_name, CASE WHEN p1.topping_name IS NULL THEN NULL ELSE CONCAT(' - Exclude ', p1.topping_name) END AS exclusion_one_name, CASE WHEN p2.topping_name IS NULL THEN NULL ELSE CONCAT(', ', p2.topping_name) END AS exclusion_two_name, CASE WHEN p3.topping_name IS NULL THEN NULL ELSE CONCAT(' - Extra ', p3.topping_name) END AS extra_one_name, CASE WHEN p4.topping_name IS NULL THEN NULL ELSE CONCAT(', ', p4.topping_name) END AS extra_two_name
+	FROM order_cte o
+	LEFT JOIN pizza_runner.pizza_toppings p1 ON o.exclusion_id_one = p1.topping_id::text
+	LEFT JOIN pizza_runner.pizza_toppings p2 ON o.exclusion_id_two = p2.topping_id::text
+	LEFT JOIN pizza_runner.pizza_toppings p3 ON o.extra_id_one = p3.topping_id::text
+	LEFT JOIN pizza_runner.pizza_toppings p4 ON o.extra_id_two = p4.topping_id::text
 )
-SELECT *, p1.topping_id AS exclusion_one_id, p1.topping_name AS exclusion_one_name,    p2.topping_id AS exclusion_two_id, 
-    p2.topping_name AS exclusion_two_name,
-    
-    p3.topping_id AS extra_one_id, 
-    p3.topping_name AS extra_one_name, 
-    
-    p4.topping_id AS extra_two_id, 
-    p4.topping_name AS extra_two_name
-FROM order_cte o
-LEFT JOIN pizza_runner.pizza_toppings p1 ON o.exclusion_id_one = p1.topping_id::text
-LEFT JOIN pizza_runner.pizza_toppings p2 ON o.exclusion_id_two = p2.topping_id::text
-LEFT JOIN pizza_runner.pizza_toppings p3 ON o.extra_id_one = p3.topping_id::text
-LEFT JOIN pizza_runner.pizza_toppings p4 ON o.extra_id_two = p4.topping_id::text;
-
+SELECT order_id, customer_id, CONCAT(pizza_name, exclusion_one_name, exclusion_two_name, extra_one_name, extra_two_name) 
+FROM concat_cte
+ORDER BY 1;
 
 -- Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients.
 
+WITH split_cte AS (
+  SELECT order_id, c.pizza_id, pizza_name, SPLIT_PART(exclusions, ', ', 1) AS exclusion_id_one, SPLIT_PART(exclusions, ', ', 2) AS exclusion_id_two, SPLIT_PART(extras, ', ', 1) AS extra_id_one, SPLIT_PART(extras, ', ', 2) AS extra_id_two, SPLIT_PART(toppings, ', ', 1) AS topping_1, SPLIT_PART(toppings, ', ', 2) AS topping_2, SPLIT_PART(toppings, ', ', 3) AS topping_3, SPLIT_PART(toppings, ', ', 4) AS topping_4, SPLIT_PART(toppings, ', ', 5) AS topping_5, SPLIT_PART(toppings, ', ', 6) AS topping_6, SPLIT_PART(toppings, ', ', 7) AS topping_7, SPLIT_PART(toppings, ', ', 8) AS topping_8
+  FROM pizza_runner.customer_orders c
+  JOIN pizza_runner.pizza_names p USING(pizza_id)
+  LEFT JOIN pizza_runner.pizza_recipes USING(pizza_id)
+), ingredients_cte AS (
+	SELECT order_id, pizza_id, pizza_name, exclusion_id_one, exclusion_id_two, extra_id_one, extra_id_two, topping_1, topping_2, topping_3, topping_4, topping_5, topping_6, topping_7, topping_8, p1.topping_name AS topping_1_name, p2.topping_name AS topping_2_name, p3.topping_name AS topping_3_name, p4.topping_name AS topping_4_name, p5.topping_name AS topping_5_name, p6.topping_name AS topping_6_name, p7.topping_name AS topping_7_name, p8.topping_name AS topping_8_name
+	FROM split_cte s
+  	LEFT JOIN pizza_runner.pizza_toppings p1 ON s.topping_1 = p1.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p2 ON s.topping_2 = p2.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p3 ON s.topping_3 = p3.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p4 ON s.topping_4 = p4.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p5 ON s.topping_5 = p5.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p6 ON s.topping_6 = p6.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p7 ON s.topping_7 = p7.topping_id::text 
+  	LEFT JOIN pizza_runner.pizza_toppings p8 ON s.topping_8 = p8.topping_id::text
+), final_cte AS (
+	SELECT order_id, pizza_name, 
+  CASE WHEN topping_1 = exclusion_id_one OR topping_1 = exclusion_id_two THEN NULL WHEN topping_1 = extra_id_one OR topping_1 = extra_id_two THEN CONCAT('2x', topping_1_name) ELSE topping_1_name END AS topping_1_final, 
+  CASE WHEN topping_2 = exclusion_id_one OR topping_2 = exclusion_id_two THEN NULL WHEN topping_2 = extra_id_one OR topping_2 = extra_id_two THEN CONCAT('2x', topping_2_name) ELSE topping_2_name END AS topping_2_final, 
+  CASE WHEN topping_3 = exclusion_id_one OR topping_3 = exclusion_id_two THEN NULL WHEN topping_3 = extra_id_one OR topping_3 = extra_id_two THEN CONCAT('2x', topping_3_name) ELSE topping_3_name END AS topping_3_final, 
+  CASE WHEN topping_4 = exclusion_id_one OR topping_4 = exclusion_id_two THEN NULL WHEN topping_4 = extra_id_one OR topping_4 = extra_id_two THEN CONCAT('2x', topping_4_name) ELSE topping_4_name END AS topping_4_final, 
+  CASE WHEN topping_5 = exclusion_id_one OR topping_5 = exclusion_id_two THEN NULL WHEN topping_5 = extra_id_one OR topping_5 = extra_id_two THEN CONCAT('2x', topping_5_name) ELSE topping_5_name END AS topping_5_final, 
+  CASE WHEN topping_6 = exclusion_id_one OR topping_6 = exclusion_id_two THEN NULL WHEN topping_6 = extra_id_one OR topping_6 = extra_id_two THEN CONCAT('2x', topping_6_name) ELSE topping_6_name END AS topping_6_final, 
+  CASE WHEN topping_7 = exclusion_id_one OR topping_7 = exclusion_id_two THEN NULL WHEN topping_7 = extra_id_one OR topping_7 = extra_id_two THEN CONCAT('2x', topping_7_name) ELSE topping_7_name END AS topping_7_final, 
+  CASE WHEN topping_8 = exclusion_id_one OR topping_8 = exclusion_id_two THEN NULL WHEN topping_8 = extra_id_one OR topping_8 = extra_id_two THEN CONCAT('2x', topping_8_name) ELSE topping_8_name END AS topping_8_final
+FROM ingredients_cte
+)
+SELECT order_id, CONCAT(pizza_name, ': ', CONCAT_WS(', ', topping_1_final, topping_2_final, topping_3_final, topping_4_final, topping_5_final, topping_6_final, topping_7_final, topping_8_final)) AS order
+FROM final_cte
+ORDER BY 1;
 
 -- What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
+
+
+
+
+

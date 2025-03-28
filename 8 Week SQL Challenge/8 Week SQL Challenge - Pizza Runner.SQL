@@ -128,7 +128,6 @@ ORDER BY 1;
 SELECT runner_id, ROUND((SUM(CASE WHEN distance <> 'null' THEN 1 END) * 100.00 / COUNT(*)), 2) AS successful_delivery_percentage
 FROM pizza_runner.runner_orders
 
-
 -- Ingredient Optimisation
 -- What are the standard ingredients for each pizza?
 
@@ -251,3 +250,66 @@ FROM (SELECT topping_1_final AS topping FROM exclude_cte
 JOIN pizza_runner.pizza_toppings ON topping_id::text = topping
 GROUP BY 1
 ORDER BY 2 DESC;
+
+-- Pricing and Ratings
+-- If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes, how much money has Pizza Runner made so far if there are no delivery fees?
+
+SELECT SUM(CASE WHEN pizza_name = 'Meatlovers' THEN 12 WHEN pizza_name = 'Vegetarian' THEN 10 END) AS total_made
+FROM pizza_runner.customer_orders
+JOIN pizza_runner.pizza_names USING (pizza_id)
+JOIN pizza_runner.runner_orders USING(order_id)
+WHERE distance <> 'null';
+
+-- What if there was an additional $1 charge for any pizza extras? (Add cheese is $1 extra)
+
+SELECT SUM(CASE WHEN pizza_name = 'Meatlovers' AND (extras <> '' AND extras <> 'null' AND extras IS NOT NULL) THEN 13 WHEN pizza_name = 'Vegetarian' AND (extras <> '' AND extras <> 'null' AND extras IS NOT NULL) THEN 11 WHEN pizza_name = 'Meatlovers' AND (extras = '' OR extras = 'null' OR extras IS NULL) THEN 12 WHEN pizza_name = 'Vegetarian' AND (extras = '' OR extras = 'null' OR extras IS NULL) THEN 10 END) AS total_made
+FROM pizza_runner.customer_orders
+JOIN pizza_runner.pizza_names USING (pizza_id)
+JOIN pizza_runner.runner_orders USING(order_id)
+WHERE distance <> 'null';
+
+-- The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner. How would you design an additional table for this new dataset? Generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.
+
+DROP TABLE IF EXISTS
+order_ratings;
+
+CREATE TABLE order_ratings (
+  "rating_id" INTEGER,
+  "order_id" INTEGER,
+  "rating" INTEGER
+ );
+ 
+INSERT INTO order_ratings
+	("rating_id", "order_id", "rating")
+VALUES
+	('1', '1', '2'),
+    ('2', '2', '4'),
+    ('3', '3', '5'),
+    ('4', '4', '3'),
+    ('5', '5', '3'),
+    ('6', '6', NULL),
+    ('7', '7', '4'),
+    ('8', '8', '5'),
+    ('9', '9', NULL),
+    ('10', '10', '5');
+
+-- Using your newly generated table, can you join all of the information together to form a table which has the following information for successful deliveries? customer_id, order_id, runner_id, rating, order_time, pickup_time, Time between order and pickup, Delivery duration, Average speed, Total number of pizzas
+
+SELECT DISTINCT(customer_id), order_id, runner_id, rating, order_time, pickup_time, (pickup_time::timestamp - order_time) AS time_between_order_and_pickup, (REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric) AS delivery_duration, ROUND((((REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric) / (REGEXP_REPLACE(duration, '[^0-9]', '', 'g')::numeric))), 2) AS average_speed, COUNT(pizza_id) AS total_number_of_pizzas
+FROM pizza_runner.runner_orders r
+JOIN pizza_runner.customer_orders c USING(order_id)
+JOIN pizza_runner.order_ratings o USING(order_id)
+WHERE distance <> 'null'
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9;
+
+-- If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled, how much money does Pizza Runner have left over after these deliveries?\\
+
+WITH money_cte AS (
+  SELECT order_id, (CASE WHEN pizza_name = 'Meatlovers' THEN 12 WHEN pizza_name = 'Vegetarian' THEN 10 END) AS selling_price, (REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')::numeric) * 0.3 AS runner_pay
+  FROM pizza_runner.customer_orders
+  JOIN pizza_runner.pizza_names USING (pizza_id)
+  JOIN pizza_runner.runner_orders USING(order_id)
+  WHERE distance <> 'null'
+)
+SELECT SUM(selling_price) - SUM(runner_pay) AS money_left
+FROM money_cte;

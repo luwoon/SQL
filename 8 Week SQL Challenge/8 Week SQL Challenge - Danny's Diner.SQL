@@ -98,7 +98,15 @@ ORDER BY 1;
 -- In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
 WITH points_cte AS (
-  SELECT sales.customer_id, order_date, product_name, CASE WHEN product_name = 'sushi' THEN price * 20 WHEN (product_name = 'curry' or product_name = 'ramen') AND order_date BETWEEN join_date AND join_date + 7 THEN price * 20 ELSE price * 10 END AS points
+  SELECT 
+    sales.customer_id, 
+    order_date, 
+    product_name, 
+    CASE
+      WHEN product_name = 'sushi' THEN price * 20 
+      WHEN (product_name = 'curry' or product_name = 'ramen') AND order_date BETWEEN join_date AND join_date + 7 THEN price * 20 
+      ELSE price * 10 
+    END AS points
   FROM dannys_diner.sales
   JOIN dannys_diner.menu USING(product_id)
   JOIN dannys_diner.members USING(customer_id)
@@ -109,7 +117,14 @@ FROM points_cte;
 
 -- Join all the things.
 
-SELECT s.customer_id, order_date, product_name, price, CASE WHEN join_date <= order_date THEN 'Y' ELSE 'N' END AS member
+SELECT 
+  s.customer_id, 
+  order_date, 
+  product_name, 
+  price, 
+  CASE 
+    WHEN join_date <= order_date THEN 'Y' ELSE 'N' 
+  END AS member
 FROM dannys_diner.sales s
 JOIN dannys_diner.menu m USING(product_id)
 LEFT JOIN dannys_diner.members e USING(customer_id)
@@ -118,7 +133,14 @@ ORDER BY 1, 2, 3;
 -- Rank all the things.
 
 WITH join_cte AS (
-  SELECT s.customer_id, order_date, product_name, price, CASE WHEN join_date <= order_date THEN 'Y' ELSE 'N' END AS member
+  SELECT 
+    s.customer_id, 
+    order_date, 
+    product_name, 
+    price, 
+    CASE 
+      WHEN join_date <= order_date THEN 'Y' ELSE 'N' 
+    END AS member
   FROM dannys_diner.sales s
   JOIN dannys_diner.menu m USING(product_id)
   LEFT JOIN dannys_diner.members e USING(customer_id)
